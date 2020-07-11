@@ -28,7 +28,7 @@ class PopulateUsers extends Seeder
                         $user = new User();
                         $user->id = $id;
                         $user->name = $order->user;
-
+                        $user->address = $order->address != null ? trim($order->address) : null;
                         $user->save();
                         $id++;
                     }

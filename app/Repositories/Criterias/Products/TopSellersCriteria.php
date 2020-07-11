@@ -8,11 +8,11 @@ use Illuminate\Support\Facades\DB;
 class TopSellersCriteria implements CriteriaInterface
 {
     private $date = null;
-    private $order = "asc";
-    public function __construct($date = null, $order = "asc")
+    private $ordering = "asc";
+    public function __construct($date = null, $ordering = "asc")
     {
         $this->date = $date;
-        $this->order = $order;
+        $this->ordering = $ordering;
     }
 
     protected function getSalesQuery($model)
@@ -32,6 +32,8 @@ class TopSellersCriteria implements CriteriaInterface
     public function apply($model, $repository)
     {
         $builder = $model->from("products as p");
+        $builder->select(["p.id","p.name"]);
+
         $builderSales = $this->getSalesQuery($model);
 
         $builder->leftJoin(
@@ -43,10 +45,10 @@ class TopSellersCriteria implements CriteriaInterface
             }
         );
 
-        $builder->select("p.*");
+        
         $builder->selectSub("IF(s.sales IS NOT NULL , s.sales, 0)", "sales");
         
-        $builder->orderBy("s.sales", $this->order);
+        $builder->orderBy("s.sales", $this->ordering);
 
         //echo $builder->toSql(); exit;
         return $builder;

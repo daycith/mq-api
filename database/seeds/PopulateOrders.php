@@ -53,7 +53,6 @@ class PopulateOrders extends Seeder
                     $order->delivery_date = $_order->deliveryDate;
                     $order->id = $_order->id;
                     $order->carrier_id = $carriers[rand(0,$totalCarriers-1)]->id;
-                    $order->address = $_order->address != null ? $_order->address : null;
                     $order->save();
 
                     if (isset($_order->products)) {

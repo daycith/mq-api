@@ -15,7 +15,8 @@ class DatabaseSeeder extends Seeder
         $this->call(PopulateProviders::class);
         $this->call(PopulateUsers::class);
         $this->call(PopulateProducts::class);
+        $this->call(PopulateInventory::class);
         $this->call(PopulateOrders::class);
-
+        $this->call(PopulateProductProvider::class);
     }
 }

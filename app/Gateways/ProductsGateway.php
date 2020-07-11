@@ -7,16 +7,19 @@ use App\Repositories\Criterias\Products\NewInventoryCriteria;
 use App\Repositories\Criterias\Products\OrderProductsCriteria;
 use App\Repositories\Criterias\Products\ProductsToShipCriteria;
 use App\Repositories\Criterias\Products\TopSellersCriteria;
+use App\Repositories\OrdersRepository;
 use App\Repositories\ProductsRepository;
+
 
 class ProductsGateway extends BaseGateway
 {
 
-    protected $repository;
+    protected $repository, $ordersRepository;
 
-    public function __construct(ProductsRepository $repository)
+    public function __construct(ProductsRepository $repository, OrdersRepository $ordersRepository)
     {
         $this->repository = $repository;
+        $this->ordersRepository = $ordersRepository;
     }
 
     public function getAvailableProducts($params = [], $perPage = 20, $page = 1)
@@ -25,28 +28,32 @@ class ProductsGateway extends BaseGateway
 
         $this->repository->pushCriteria(new AvailableProductsCriteria($date));
         //return $this->repository->paginate($perPage, ['*'], "page", $page);
-        return $this->repository->all();
+        return ["data" => $this->repository->all()];
     }
 
     public function getOrderProducts($orderId, $params = [], $perPage = 20, $page = 1)
     {
-        $this->repository->pushCriteria(new OrderProductsCriteria($orderId),"availableCriteria");
+        
+        $this->ordersRepository->findOrFail($orderId);
+        
+        $this->repository->pushCriteria(new OrderProductsCriteria($orderId), "availableCriteria");
         $available =  $this->repository->all();
 
         $this->repository->removeCriteria("availableCriteria");
 
-        $this->repository->pushCriteria(new OrderProductsCriteria($orderId,false),"notAvailableCriteria");
+        $this->repository->pushCriteria(new OrderProductsCriteria($orderId, false), "notAvailableCriteria");
         $needToBeProvided =  $this->repository->all();
 
-        return [
+        return ["data" => [
             "toBeShipped" => $available,
             "needToBeProvided" => $needToBeProvided
-        ];
+        ]];
     }
 
-    public function getNewInventory($date){
+    public function getNewInventory($date)
+    {
         $this->repository->pushCriteria(new NewInventoryCriteria($date));
-        return $this->repository->all();
+        return ["data" => $this->repository->all()];
     }
 
     public function getTopSeller($params = [], $perPage = 20, $page = 1)
@@ -54,13 +61,14 @@ class ProductsGateway extends BaseGateway
         $date = isset($params["date"]) ? $params["date"] : null;
         $order = isset($params["order"]) ? $params["order"] : "asc";
         $this->repository->pushCriteria(new TopSellersCriteria($date, $order));
-        return $this->repository->all();
+        return ["data" => $this->repository->all()];
     }
 
 
     public function getProductsToShip($params = [], $perPage = 20, $page = 1)
     {
-        $this->repository->pushCriteria(new ProductsToShipCriteria());
-        return $this->repository->all();
+        $date = isset($params["date"]) ? $params["date"] : null;
+        $this->repository->pushCriteria(new ProductsToShipCriteria($date));
+        return ["data" => $this->repository->all()];
     }
 }

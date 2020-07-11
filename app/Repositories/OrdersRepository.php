@@ -2,9 +2,9 @@
 
 namespace App\Repositories;
 
-use App\Provider;
+use App\Order;
 
-class ProviderRepository extends BaseRepository
+class OrdersRepository extends BaseRepository
 {
     /**
      * Returns specified model class name.
@@ -13,6 +13,6 @@ class ProviderRepository extends BaseRepository
      */
     public function model()
     {
-        return Provider::class;
+        return Order::class;
     }
 }
