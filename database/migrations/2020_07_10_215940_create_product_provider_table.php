@@ -18,6 +18,9 @@ class CreateProductProviderTable extends Migration
             $table->unsignedBigInteger("product_id");
             $table->unsignedBigInteger("provider_id");
             $table->timestamps();
+
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('CASCADE');
+            $table->foreign('provider_id')->references('id')->on('providers')->onDelete('CASCADE');
         });
     }
 

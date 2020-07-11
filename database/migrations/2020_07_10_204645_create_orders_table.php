@@ -20,6 +20,9 @@ class CreateOrdersTable extends Migration
             $table->tinyInteger("priority")->default(1);
             $table->date("delivery_date");
             $table->timestamps();
+
+            $table->foreign('carrier_id')->references('id')->on('carriers')->onDelete('SET NULL')->onUpdate('SET NULL');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('SET NULL')->onUpdate('SET NULL');
         });
     }
 
