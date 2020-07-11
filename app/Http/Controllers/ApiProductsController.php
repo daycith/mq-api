@@ -28,12 +28,12 @@ class ApiProductsController extends ApiController
     public function getOrderProducts(Request $request)
     {
         $params = $request->all();
-
+        
         if(!isset($params["order_id"])){
             return response()->json("order_id is required",Response::HTTP_UNPROCESSABLE_ENTITY);
         }
         $orderId = $params["order_id"];
-        $items = $this->gateway->getOrderProducts($orderId);
+        $items = $this->gateway->getOrderProducts($orderId, static::DATE);
         return response()->json($items, Response::HTTP_OK);
     }
 

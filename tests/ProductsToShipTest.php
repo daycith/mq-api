@@ -17,6 +17,7 @@ class ProductsToShipTest extends TestCase
             "order_id",
             "address",
             "to_be_listed",
+            "carrier"
         ]]]);
 
     }

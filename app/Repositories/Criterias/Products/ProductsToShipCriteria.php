@@ -19,6 +19,7 @@ class ProductsToShipCriteria implements CriteriaInterface
         $builder = $model->from("products as p")
             ->join("order_items as oi", "p.id", "oi.product_id")
             ->join("orders as o", "oi.order_id", "o.id")
+            ->join("carriers as c", "o.carrier_id", "c.id")
             ->join("users as u", "o.user_id", "u.id")
             ->leftJoin("inventories as i", function ($q) {
                 $q->on("p.id", "i.product_id")
@@ -28,7 +29,8 @@ class ProductsToShipCriteria implements CriteriaInterface
             "p.id",
             "p.name",
             "o.id as order_id",
-            "u.address"
+            "u.address",
+            "c.name as carrier"
         ]);
 
         $builder->selectSub("IF(SUM(oi.quantity) IS NOT NULL , SUM(oi.quantity),0)", "to_be_listed");

@@ -9,11 +9,15 @@ class OrderProductsCriteria implements CriteriaInterface
 {
 
     private $orderId = null;
+    private $date = null;
 
-    public function __construct($orderId = null, $available = true)
+    public function __construct($orderId = null, $available = true, $date= null)
     {
         $this->orderId = $orderId;
         $this->available = $available;
+        $this->date = $date;
+
+        
     }
 
 
@@ -25,6 +29,7 @@ class OrderProductsCriteria implements CriteriaInterface
             ->selectSub("SUM(_oi.quantity)", "reserved_quantity")
             ->from("orders as _o")
             ->join("order_items as _oi", "_o.id", "_oi.order_id")
+            ->where("_o.delivery_date",$this->date)
             ->groupBy("_oi.product_id")
             ->groupBy("_o.priority");
 
@@ -38,13 +43,17 @@ class OrderProductsCriteria implements CriteriaInterface
         $correlatedQuery = $this->getReservedQuery($model);
         $operator = $this->available ? "<=" : ">";
         $builder = $model->select([
-            "p.*",
+            "p.id",
+            "p.name",
             "i.quantity as in_stock"
         ])
             ->selectSub("IF(SUM(s.reserved_quantity) IS NOT NULL,SUM(s.reserved_quantity),0)", "total_reserved")
             ->selectSub("IF(SUM(oi.quantity) IS NOT NULL, SUM(oi.quantity), 0)", "total_ordered")
             ->from("products as p")
-            ->leftJoin("inventories as i", "p.id", "i.product_id")
+            ->leftJoin("inventories as i", function ($q) {
+                $q->on("p.id", "i.product_id")
+                    ->where("i.date", $this->date);
+            })
             ->join("order_items as oi", "p.id", "oi.product_id")
             ->join("orders as o", "oi.order_id", "o.id")
             ->leftJoin(

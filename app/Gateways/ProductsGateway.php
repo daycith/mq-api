@@ -31,17 +31,17 @@ class ProductsGateway extends BaseGateway
         return ["data" => $this->repository->all()];
     }
 
-    public function getOrderProducts($orderId, $params = [], $perPage = 20, $page = 1)
+    public function getOrderProducts($orderId, $date, $params = [], $perPage = 20, $page = 1)
     {
         
         $this->ordersRepository->findOrFail($orderId);
         
-        $this->repository->pushCriteria(new OrderProductsCriteria($orderId), "availableCriteria");
+        $this->repository->pushCriteria(new OrderProductsCriteria($orderId, true, $date), "availableCriteria");
         $available =  $this->repository->all();
 
         $this->repository->removeCriteria("availableCriteria");
 
-        $this->repository->pushCriteria(new OrderProductsCriteria($orderId, false), "notAvailableCriteria");
+        $this->repository->pushCriteria(new OrderProductsCriteria($orderId, false, $date), "UnavailableCriteria",$date);
         $needToBeProvided =  $this->repository->all();
 
         return ["data" => [
